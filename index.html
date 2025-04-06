@@ -3,56 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Даник Меликджанян — всё о нём</title>
+    <title>Даник Меликджанян: Героев не бывает много</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
-            color: #333;
+            font-family: 'Rubik', sans-serif;
+            background-color: #2d2d2d;
+            color: #fff;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
         h1 {
             color: #ff6347;
-        }
-        .joke {
-            font-size: 1.2em;
-            margin: 20px;
-            padding: 10px;
-            background-color: #f7d7c4;
-            border-radius: 10px;
-        }
-        .joke:nth-child(even) {
-            background-color: #d6f5d6;
-        }
-        footer {
-            font-size: 0.8em;
-            color: #888;
+            font-size: 3.5em;
             margin-top: 50px;
         }
-        audio {
+        h2 {
+            color: #ffcc00;
+            font-size: 2.5em;
+        }
+        .content {
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid #4682b4;
+            border-radius: 10px;
+            background-color: #333;
+        }
+        .memes img {
+            width: 200px;
+            height: auto;
+            border-radius: 10px;
+            margin: 10px;
+            transition: transform 0.3s;
+        }
+        .memes img:hover {
+            transform: scale(1.1);
+        }
+        .emoji {
+            font-size: 3em;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #ff6347;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.5em;
+            cursor: pointer;
             margin-top: 20px;
+        }
+        button:hover {
+            background-color: #ff4500;
+        }
+        footer {
+            margin-top: 30px;
+            font-size: 1.2em;
+            color: #aaa;
+        }
+        .screamer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: red;
+            font-size: 3em;
+            text-align: center;
+            padding-top: 200px;
+            z-index: 9999;
+        }
+        .screamer img {
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
-    <h1>Даник Меликджанян — всё о нём</h1>
+    <h1>Даник Меликджанян: Герой, которого мы заслужили</h1>
 
-    <div class="joke">Даник такой умный, что когда его спрашивают, как он так умудряется, он отвечает: 'Я просто не думаю!' 🤷‍♂️</div>
-    <div class="joke">Даник — единственный человек, который может забыть, как его зовут, если у него спрашивают прямо на улице. 😅</div>
-    <div class="joke">Когда Даник говорит 'Я всё помню!', ты знаешь, что через пять минут он забудет, что говорил это. 🤦‍♂️</div>
-    <div class="joke">Даник пытается быть серьёзным, но даже зеркало не воспринимает его всерьез. 😂</div>
-    <div class="joke">Если бы Даник был на острове, он забыл бы, как добраться до дома... даже если это его собственный дом. 🏝️</div>
-    <div class="joke">Даник всегда в поиске новых идей. Правда, новые идеи обычно заканчиваются 'Ну, я не знаю, что делать дальше'. 🤷‍♂️💡</div>
-    <div class="joke">Когда Даник использует GPS, его всегда спрашивают: 'Тебе точно нужна эта дорога?' 📍🚗</div>
-    <div class="joke">Даник — как Wi-Fi: никогда не работает, когда нужен. 😜</div>
+    <div class="content">
+        <h2>Самые смешные факты о Данике</h2>
+        <p>1. Даник — единственный человек, который смеется, даже когда шутка не была сказана.</p>
+        <p>2. Он — живое воплощение фразы "Не все супергерои носят костюмы" — он просто забыл их дома.</p>
+        <p>3. Даник всегда находит путь к холодильнику, даже если он забыл, что хотел поесть.</p>
+        <p>4. Он может найти себя в любой ситуации... но не всегда помнит, что делает.</p>
+    </div>
 
-    <audio controls>
-        <source"трагедия.mp3" type="audio/mp3">
-        Ваш браузер не поддерживает аудио.
-    </audio>
+    <div class="memes">
+        <h2>Мемы о Данике</h2>
+        <img src="https://via.placeholder.com/200x200.png?text=Danik+Meme+1" alt="Meme 1">
+        <img src="https://via.placeholder.com/200x200.png?text=Danik+Meme+2" alt="Meme 2">
+        <img src="https://via.placeholder.com/200x200.png?text=Danik+Meme+3" alt="Meme 3">
+    </div>
+
+    <div class="emoji">😜😂🤣</div>
+
+    <button onclick="triggerScreamer()">Нажми меня, если осмелишься!</button>
+
+    <div class="screamer" id="screamer">
+        <h1>Сюрприз! 😱</h1>
+        <img src="https://media.giphy.com/media/3o7btPwHyH0Hq0CKrG/giphy.gif" alt="Screamer">
+    </div>
 
     <footer>
-        <p>Сайт создан как шутка. Все совпадения с реальными событиями случайны!</p>
+        <p>Сайт создан с любовью (и немного издевательства) для Даника Меликджаняна.</p>
     </footer>
+
+    <script>
+        function triggerScreamer() {
+            document.getElementById('screamer').style.display = 'block';
+            setTimeout(function() {
+                document.getElementById('screamer').style.display = 'none';
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
