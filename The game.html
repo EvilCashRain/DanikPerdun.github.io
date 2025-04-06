@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Зомби Аркада</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 70%, #228B22 100%); 
+        }
+        canvas {
+            display: block;
+        }
+        #controls {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+        .touch-button {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            border-radius: 50%;
+            user-select: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="controls">
+        <div id="leftButton" class="touch-button">←</div>
+        <div id="rightButton" class="touch-button">→</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let gameStarted = true;
+        let score = 0;
+        let lives = 3;
+        let difficulty = 1;
+        let lastSpawnX = null;
+
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 100,
+            radius: 40,
+            speed: 7  
+        };
+
+        let robuxes = [];
+        let moveLeft = false;
+        let moveRight = false;
+
+        document.getElementById('leftButton').addEventListener('touchstart', () => moveLeft = true);
+        document.getElementById('leftButton').addEventListener('touchend', () => moveLeft = false);
+        document.getElementById('rightButton').addEventListener('touchstart', () => moveRight = true);
+        document.getElementById('rightButton').addEventListener('touchend', () => moveRight = false);
+
+        function updatePlayer() {
+            if (moveLeft && player.x > player.radius) player.x -= player.speed;
+            if (moveRight && player.x < canvas.width - player.radius) player.x += player.speed;
+        }
+
+        function createRobux() {
+            if (Math.random() < 0.004 * difficulty) {
+                let x;
+                do {
+                    x = Math.random() * (canvas.width - 60);
+                } while (lastSpawnX !== null && Math.abs(x - lastSpawnX) < 150);
+                
+                lastSpawnX = x;
+                const isFast = Math.random() < 0.2;
+                const speed = isFast ? 3 : 1.5;
+                const color = isFast ? 'red' : 'green';
+                robuxes.push({ x, y: 0, radius: 30, speed, color });
+            }
+        }
+
+        function updateRobuxes() {
+            for (let i = robuxes.length - 1; i >= 0; i--) {
+                if (!robuxes[i]) continue;
+                
+                robuxes[i].y += robuxes[i].speed;
+
+                let dx = player.x - robuxes[i].x;
+                let dy = player.y - robuxes[i].y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < player.radius + robuxes[i].radius) {
+                    robuxes.splice(i, 1);
+                    lives--;
+                    if (lives <= 0) {
+                        endGame();
+                        return;
+                    }
+                }
+
+                if (robuxes[i] && robuxes[i].y > canvas.height) {
+                    robuxes.splice(i, 1);
+                    score++;
+                    if (score % 10 === 0) difficulty += 0.03;
+                }
+            }
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = 'yellow';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(player.x - 10, player.y - 10, 5, 0, Math.PI * 2);
+            ctx.arc(player.x + 10, player.y - 10, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(player.x, player.y + 5, 15, 0, Math.PI);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawRobux(robux) {
+            ctx.fillStyle = robux.color;
+            ctx.beginPath();
+            ctx.arc(robux.x, robux.y, robux.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'black';
+            ctx.font = `${robux.radius * 1.2}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('$', robux.x, robux.y);
+
+            if (robux.color === 'red') {
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(robux.x - 15, robux.y - 15);
+                ctx.lineTo(robux.x - 25, robux.y - 30);
+                ctx.lineTo(robux.x - 10, robux.y - 20);
+
+                ctx.moveTo(robux.x + 15, robux.y - 15);
+                ctx.lineTo(robux.x + 25, robux.y - 30);
+                ctx.lineTo(robux.x + 10, robux.y - 20);
+                ctx.stroke();
+            }
+        }
+
+        function drawUI() {
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.fillText(`Счет: ${score}`, 10, 30);
+            ctx.fillText(`Жизни: ${lives}`, 10, 60);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            robuxes.forEach(drawRobux);
+            drawUI();
+        }
+
+        function gameLoop() {
+            if (gameStarted) {
+                updatePlayer();
+                createRobux();
+                updateRobuxes();
+                draw();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            gameStarted = false;
+            alert(`Игра окончена! Ваш счет: ${score}`);
+            location.reload();
+        }
+
+        gameLoop();
+    </script>
+
+</body></html>
