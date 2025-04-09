@@ -1,209 +1,336 @@
 <!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Зомби Аркада</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 70%, #228B22 100%); 
-        }
-        canvas {
-            display: block;
-        }
-        #controls {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 20px;
-        }
-        .touch-button {
-            width: 80px;
-            height: 80px;
-            background-color: rgba(255, 255, 255, 0.3);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            border-radius: 50%;
-            user-select: none;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Зомби Аркада</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      touch-action: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      font-family: 'Arial', sans-serif;
+    }
+    body {
+      background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 70%, #228B22 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+    #languageSelection {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+      z-index: 10;
+    }
+    .language-button {
+      width: 150px;
+      height: 50px;
+      background-color: rgba(255, 255, 255, 0.6);
+      color: white;
+      font-size: 20px;
+      margin: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    #startControls {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+    .menu-button {
+      width: 150px;
+      height: 50px;
+      background-color: rgba(255, 255, 255, 0.6);
+      color: white;
+      font-size: 20px;
+      margin: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    #volumeControl {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    #volumeSlider {
+      width: 100px;
+    }
+    #controls {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 10;
+    }
+    .touch-button {
+      width: 70px;
+      height: 70px;
+      background-color: rgba(255, 255, 255, 0.3);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      border-radius: 50%;
+      user-select: none;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    <div id="controls">
-        <div id="leftButton" class="touch-button">←</div>
-        <div id="rightButton" class="touch-button">→</div>
+  <div id="languageSelection">
+    <div class="language-button" id="languageRu">Русский</div>
+    <div class="language-button" id="languageEn">English</div>
+  </div>
+
+  <div id="startControls">
+    <div class="menu-button" id="gameStartButton"></div>
+    <div class="menu-button" id="settingsButton"></div>
+    <div id="volumeControl" style="display:none;">
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
     </div>
+  </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+  <canvas id="gameCanvas"></canvas>
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+  <div id="controls">
+    <div id="leftButton" class="touch-button">←</div>
+    <div id="rightButton" class="touch-button">→</div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    let language = 'ru';
+    const startControls = document.getElementById('startControls');
+    const gameStartButton = document.getElementById('gameStartButton');
+    const settingsButton = document.getElementById('settingsButton');
+    const volumeControl = document.getElementById('volumeControl');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const bgMusic = document.getElementById('bgMusic');
+
+    // Language selection
+    document.getElementById('languageRu').addEventListener('click', () => {
+      language = 'ru';
+      setLanguage();
+    });
+
+    document.getElementById('languageEn').addEventListener('click', () => {
+      language = 'en';
+      setLanguage();
+    });
+
+    function setLanguage() {
+      document.getElementById('languageSelection').style.display = 'none';
+      gameStartButton.textContent = language === 'ru' ? 'Начать игру' : 'Start Game';
+      settingsButton.textContent = language === 'ru' ? 'Настройки' : 'Settings';
+      startControls.style.display = 'flex';
+    }
+
+    gameStartButton.addEventListener('click', () => {
+      startControls.style.display = 'none';
+      bgMusic.play();
+      gameStarted = true;
+      gameLoop();
+    });
+
+    settingsButton.addEventListener('click', () => {
+      volumeControl.style.display = volumeControl.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    volumeSlider.addEventListener('input', () => {
+      bgMusic.volume = volumeSlider.value;
+    });
+  </script>
+  <script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  let gameStarted = false;
+  let score = 0;
+  let lives = 3;
+  let difficulty = 1;
+  let lastSpawnX = null;
+
+  const player = {
+    x: canvas.width / 2,
+    y: canvas.height - 100,
+    radius: 40,
+    speed: 7
+  };
+
+  let robuxes = [];
+  let moveLeft = false;
+  let moveRight = false;
+
+  document.getElementById('leftButton').addEventListener('touchstart', (e) => { e.preventDefault(); moveLeft = true; });
+  document.getElementById('leftButton').addEventListener('touchend', () => moveLeft = false);
+  document.getElementById('rightButton').addEventListener('touchstart', (e) => { e.preventDefault(); moveRight = true; });
+  document.getElementById('rightButton').addEventListener('touchend', () => moveRight = false);
+
+  function updatePlayer() {
+    if (moveLeft && player.x > player.radius) player.x -= player.speed;
+    if (moveRight && player.x < canvas.width - player.radius) player.x += player.speed;
+  }
+
+  function createRobux() {
+    if (Math.random() < 0.004 * difficulty) {
+      let x;
+      do {
+        x = Math.random() * (canvas.width - 60);
+      } while (lastSpawnX !== null && Math.abs(x - lastSpawnX) < 150);
+      lastSpawnX = x;
+
+      const isFast = Math.random() < 0.2;
+      const speed = isFast ? 3 : 1.5;
+      const color = isFast ? 'red' : 'green';
+      robuxes.push({ x, y: 0, radius: 30, speed, color });
+    }
+  }
+
+  function updateRobuxes() {
+    for (let i = robuxes.length - 1; i >= 0; i--) {
+      if (!robuxes[i]) continue;
+      robuxes[i].y += robuxes[i].speed;
+
+      let dx = player.x - robuxes[i].x;
+      let dy = player.y - robuxes[i].y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < player.radius + robuxes[i].radius) {
+        robuxes.splice(i, 1);
+        lives--;
+        if (lives <= 0) {
+          endGame();
+          return;
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+      }
 
-        let gameStarted = true;
-        let score = 0;
-        let lives = 3;
-        let difficulty = 1;
-        let lastSpawnX = null;
+      if (robuxes[i] && robuxes[i].y > canvas.height) {
+        robuxes.splice(i, 1);
+        score++;
+        if (score % 10 === 0) difficulty += 0.03;
+      }
+    }
+  }
 
-        const player = {
-            x: canvas.width / 2,
-            y: canvas.height - 100,
-            radius: 40,
-            speed: 7  
-        };
+  function drawPlayer() {
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+    ctx.fill();
 
-        let robuxes = [];
-        let moveLeft = false;
-        let moveRight = false;
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(player.x - 10, player.y - 10, 5, 0, Math.PI * 2);
+    ctx.arc(player.x + 10, player.y - 10, 5, 0, Math.PI * 2);
+    ctx.fill();
 
-        document.getElementById('leftButton').addEventListener('touchstart', () => moveLeft = true);
-        document.getElementById('leftButton').addEventListener('touchend', () => moveLeft = false);
-        document.getElementById('rightButton').addEventListener('touchstart', () => moveRight = true);
-        document.getElementById('rightButton').addEventListener('touchend', () => moveRight = false);
+    ctx.beginPath();
+    ctx.arc(player.x, player.y + 5, 15, 0, Math.PI);
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
 
-        function updatePlayer() {
-            if (moveLeft && player.x > player.radius) player.x -= player.speed;
-            if (moveRight && player.x < canvas.width - player.radius) player.x += player.speed;
-        }
+  function drawRobux(robux) {
+    ctx.fillStyle = robux.color;
+    ctx.beginPath();
+    ctx.arc(robux.x, robux.y, robux.radius, 0, Math.PI * 2);
+    ctx.fill();
 
-        function createRobux() {
-            if (Math.random() < 0.004 * difficulty) {
-                let x;
-                do {
-                    x = Math.random() * (canvas.width - 60);
-                } while (lastSpawnX !== null && Math.abs(x - lastSpawnX) < 150);
-                
-                lastSpawnX = x;
-                const isFast = Math.random() < 0.2;
-                const speed = isFast ? 3 : 1.5;
-                const color = isFast ? 'red' : 'green';
-                robuxes.push({ x, y: 0, radius: 30, speed, color });
-            }
-        }
+    ctx.fillStyle = 'black';
+    ctx.font = `${robux.radius * 1.2}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('$', robux.x, robux.y);
 
-        function updateRobuxes() {
-            for (let i = robuxes.length - 1; i >= 0; i--) {
-                if (!robuxes[i]) continue;
-                
-                robuxes[i].y += robuxes[i].speed;
+    if (robux.color === 'red') {
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(robux.x - 15, robux.y - 15);
+      ctx.lineTo(robux.x - 25, robux.y - 30);
+      ctx.lineTo(robux.x - 10, robux.y - 20);
 
-                let dx = player.x - robuxes[i].x;
-                let dy = player.y - robuxes[i].y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
+      ctx.moveTo(robux.x + 15, robux.y - 15);
+      ctx.lineTo(robux.x + 25, robux.y - 30);
+      ctx.lineTo(robux.x + 10, robux.y - 20);
+      ctx.stroke();
+    }
+  }
 
-                if (distance < player.radius + robuxes[i].radius) {
-                    robuxes.splice(i, 1);
-                    lives--;
-                    if (lives <= 0) {
-                        endGame();
-                        return;
-                    }
-                }
+  function drawUI() {
+    ctx.fillStyle = 'white';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(language === 'ru' ? `Счет: ${score}` : `Score: ${score}`, 10, 30);
+    ctx.fillText(language === 'ru' ? `Жизни: ${lives}` : `Lives: ${lives}`, 10, 60);
+  }
 
-                if (robuxes[i] && robuxes[i].y > canvas.height) {
-                    robuxes.splice(i, 1);
-                    score++;
-                    if (score % 10 === 0) difficulty += 0.03;
-                }
-            }
-        }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPlayer();
+    robuxes.forEach(drawRobux);
+    drawUI();
+  }
 
-        function drawPlayer() {
-            ctx.fillStyle = 'yellow';
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-            ctx.fill();
+  function gameLoop() {
+    if (gameStarted) {
+      updatePlayer();
+      createRobux();
+      updateRobuxes();
+      draw();
+    }
+    requestAnimationFrame(gameLoop);
+  }
 
-            ctx.fillStyle = 'black';
-            ctx.beginPath();
-            ctx.arc(player.x - 10, player.y - 10, 5, 0, Math.PI * 2);
-            ctx.arc(player.x + 10, player.y - 10, 5, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(player.x, player.y + 5, 15, 0, Math.PI);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
-
-        function drawRobux(robux) {
-            ctx.fillStyle = robux.color;
-            ctx.beginPath();
-            ctx.arc(robux.x, robux.y, robux.radius, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = 'black';
-            ctx.font = `${robux.radius * 1.2}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('$', robux.x, robux.y);
-
-            if (robux.color === 'red') {
-                ctx.strokeStyle = 'black';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.moveTo(robux.x - 15, robux.y - 15);
-                ctx.lineTo(robux.x - 25, robux.y - 30);
-                ctx.lineTo(robux.x - 10, robux.y - 20);
-
-                ctx.moveTo(robux.x + 15, robux.y - 15);
-                ctx.lineTo(robux.x + 25, robux.y - 30);
-                ctx.lineTo(robux.x + 10, robux.y - 20);
-                ctx.stroke();
-            }
-        }
-
-        function drawUI() {
-            ctx.fillStyle = 'white';
-            ctx.font = '20px Arial';
-            ctx.fillText(`Счет: ${score}`, 10, 30);
-            ctx.fillText(`Жизни: ${lives}`, 10, 60);
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawPlayer();
-            robuxes.forEach(drawRobux);
-            drawUI();
-        }
-
-        function gameLoop() {
-            if (gameStarted) {
-                updatePlayer();
-                createRobux();
-                updateRobuxes();
-                draw();
-            }
-            requestAnimationFrame(gameLoop);
-        }
-
-        function endGame() {
-            gameStarted = false;
-            alert(`Игра окончена! Ваш счет: ${score}`);
-            location.reload();
-        }
-
-        gameLoop();
-    </script>
-
-</body></html>
+  function endGame() {
+    gameStarted = false;
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    setTimeout(() => {
+      alert((language === 'ru' ? 'Игра окончена! Ваш счет: ' : 'Game Over! Your score: ') + score);
+      location.reload();
+    }, 100);
+  }
+</script>
+</body>
+</html>
