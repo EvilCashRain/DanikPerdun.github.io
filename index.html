@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-  <title>Зомби Аркада</title>
+<html lang="ru"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"> 
+  <title>Зомби Аркада</title> 
   <style>
     html, body {
       margin: 0;
@@ -47,6 +47,17 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+    }
+    #gameTitle {
+      font-size: 36px;
+      color: #fff700;
+      text-shadow: 2px 2px 4px #000;
+      position: absolute;
+      top: 15%;
+      z-index: 11;
+      text-align: center;
+      display: none;
+      padding: 0 10px;
     }
     #startControls {
       display: none;
@@ -114,38 +125,44 @@
       width: 150px;
       margin: 10px;
     }
-  </style>
-</head>
-<body>
-  <div id="languageSelection">
-    <div class="language-button" id="languageRu">Русский</div>
-    <div class="language-button" id="languageEn">English</div>
+  </style> 
+ </head> 
+ <body> 
+  <div id="languageSelection"> 
+   <div class="language-button" id="languageRu">
+    Русский
+   </div> 
+   <div class="language-button" id="languageEn">
+    English
+   </div> 
+  </div> 
+  <div id="gameTitle">ЭВИЛ КЕШ РЕЙН</div>
+  <div id="startControls"> 
+   <div class="menu-button" id="gameStartButton"></div> 
+  </div> 
+  <div id="settingsButton">
+   ⚙
+  </div> 
+  <div id="pauseMenu"> 
+   <div id="volumeLabel">
+    Громкость
+   </div> 
+   <input type="range" id="volumeSlider" min="0" max="1" step="0.01"> 
+   <div class="menu-button" id="resumeButton">
+    Продолжить
+   </div> 
   </div>
-
-  <div id="startControls">
-    <div class="menu-button" id="gameStartButton"></div>
-  </div>
-
-  <div id="settingsButton">⚙</div>
-
-  <div id="pauseMenu">
-    <div id="volumeLabel">Громкость</div>
-    <input type="range" id="volumeSlider" min="0" max="1" step="0.01">
-    <div class="menu-button" id="resumeButton">Продолжить</div>
-  </div>
-
-  <canvas id="gameCanvas"></canvas>
-  <div id="controls">
-    <div id="leftButton" class="touch-button">←</div>
-    <div id="rightButton" class="touch-button">→</div>
-  </div>
-
-  <audio id="bgMusic" loop>
-    <source src="music.mp3" type="audio/mpeg">
-  </audio>
-
+  <canvas id="gameCanvas"></canvas> 
+  <div id="controls"> 
+   <div id="leftButton" class="touch-button">←</div> 
+   <div id="rightButton" class="touch-button">→</div> 
+  </div> 
+  <audio id="bgMusic" loop> 
+   <source src="music.mp3" type="audio/mpeg"> 
+  </audio> 
   <script>
     let language = 'ru';
+    const gameTitle = document.getElementById('gameTitle');
     const startControls = document.getElementById('startControls');
     const gameStartButton = document.getElementById('gameStartButton');
     const bgMusic = document.getElementById('bgMusic');
@@ -155,7 +172,6 @@
     const resumeButton = document.getElementById('resumeButton');
     const volumeLabel = document.getElementById('volumeLabel');
 
-    // Язык
     document.getElementById('languageRu').addEventListener('click', () => {
       language = 'ru';
       setLanguage();
@@ -167,6 +183,8 @@
 
     function setLanguage() {
       document.getElementById('languageSelection').style.display = 'none';
+      gameTitle.textContent = language === 'ru' ? 'ЭВИЛ КЕШ РЕЙН' : 'EVIL CASH RAIN';
+      gameTitle.style.display = 'block';
       gameStartButton.textContent = language === 'ru' ? 'Начать игру' : 'Start Game';
       resumeButton.textContent = language === 'ru' ? 'Продолжить' : 'Resume';
       volumeLabel.textContent = language === 'ru' ? 'Громкость' : 'Volume';
@@ -175,6 +193,7 @@
 
     gameStartButton.addEventListener('click', () => {
       startControls.style.display = 'none';
+      gameTitle.style.display = 'none';
       settingsButton.style.display = 'block';
       bgMusic.play();
       gameStarted = true;
@@ -196,7 +215,6 @@
       bgMusic.volume = volumeSlider.value;
     });
 
-    // Игра
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -314,7 +332,6 @@
         ctx.moveTo(robux.x - 15, robux.y - 15);
         ctx.lineTo(robux.x - 25, robux.y - 30);
         ctx.lineTo(robux.x - 10, robux.y - 20);
-
         ctx.moveTo(robux.x + 15, robux.y - 15);
         ctx.lineTo(robux.x + 25, robux.y - 30);
         ctx.lineTo(robux.x + 10, robux.y - 20);
@@ -357,9 +374,8 @@
       }, 100);
     }
 
-    // Установим начальную громкость
     bgMusic.volume = 0.5;
     volumeSlider.value = 0.5;
-  </script>
-</body>
+  </script> 
+ </body>
 </html>
